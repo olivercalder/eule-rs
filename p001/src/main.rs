@@ -9,8 +9,8 @@ use combinatorial::Combinations;
 
 /// Computes the sum of all multiples of the given numbers below the specified limit.
 ///
-/// Assumes that `numbers` does not contain duplicate entries and that no entry is a multiple of
-/// any other entry.
+/// Assumes that `numbers` does not contain duplicate entries that no entry is a multiple of,
+/// any other entry, and that all entries are positive.
 fn sum_of_multiples(numbers: Vec<i64>, limit: i64) -> i64 {
     Combinations::all(numbers).skip(1).fold(0, |acc, comb| {
         let product: i64 = comb.iter().product();
@@ -21,9 +21,10 @@ fn sum_of_multiples(numbers: Vec<i64>, limit: i64) -> i64 {
     })
 }
 
-/// Removes duplicate numbers and entries which are multiples of another entry.
+/// Removes duplicate numbers and entries which are multiples of another entry and makes all
+/// entries positive.
 fn remove_duplicates_multiples(numbers: Vec<i64>) -> Vec<i64> {
-    let mut clean = numbers.clone();
+    let mut clean: Vec<i64> = numbers.iter().map(|x| x * (!((x >> 62) & 2) + 2)).collect();
     clean.sort_unstable();
     clean.dedup();
     clean.iter().fold(Vec::new(), |mut acc, number| {
@@ -36,8 +37,8 @@ fn remove_duplicates_multiples(numbers: Vec<i64>) -> Vec<i64> {
 
 /// Computes the sum of all multiples of the given numbers below the specified limit.
 ///
-/// Computes the correct answer regardless of whether `numbers` contains duplicate entries or
-/// entries which are multiples of any other entry.
+/// Computes the correct answer regardless of whether `numbers` contains duplicate entries,
+/// negative numbers, or entries which are multiples of any other entry.
 fn sum_of_multiples_safe(numbers: Vec<i64>, limit: i64) -> i64 {
     let clean = remove_duplicates_multiples(numbers);
     sum_of_multiples(clean, limit)
@@ -73,5 +74,12 @@ mod tests {
         let numbers = vec![3, 5, 6];
         let limit = 1000;
         assert_eq!(sum_of_multiples_safe(numbers, limit), 233168);
+    }
+
+    #[test]
+    fn test_numbers_with_negatives() {
+        let numbers = vec![2, -3, 5, 7];
+        let limit = 1000;
+        assert_eq!(sum_of_multiples_safe(numbers, limit), 385788);
     }
 }
