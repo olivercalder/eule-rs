@@ -5,7 +5,7 @@ The sum of these multiples is 23.
 Find the sum of all the multiples of 3 or 5 below 1000.
 */
 
-use combinatorial::Combinations;
+use combinatorial::{Combinations, triangle_number};
 
 /// Computes the sum of all multiples of the given numbers below the specified limit.
 ///
@@ -15,7 +15,7 @@ fn sum_of_multiples(numbers: Vec<i64>, limit: i64) -> i64 {
     Combinations::all(numbers).skip(1).fold(0, |acc, comb| {
         let product: i64 = comb.iter().product();
         let count = (limit - 1) / product;
-        let sum = count * (count + 1) / 2;
+        let sum = triangle_number(count as usize) as i64;
         let value = sum * product;
         acc + (-1 + 2 * (comb.len() % 2) as i64) * value
     })
